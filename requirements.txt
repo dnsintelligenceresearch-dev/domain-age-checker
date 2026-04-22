@@ -1,0 +1,6 @@
+Flask==3.0.0
+python-whois==0.9.6
+validators==0.22.0
+flask-caching==2.1.0
+python-dateutil==2.8.2
+requests==2.31.0
