@@ -4,3 +4,4 @@ validators==0.22.0
 flask-caching==2.1.0
 python-dateutil==2.8.2
 requests==2.31.0
+gunicorn==21.2.0
