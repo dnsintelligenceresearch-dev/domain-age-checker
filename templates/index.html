@@ -120,6 +120,10 @@ function displayResults(data) {
                     <span class="label">Expires:</span>
                     <span class="value">${escapeHtml(data.expiration_date)}</span>
                 </div>
+                <div class="info-row">
+                   <span class="label">Expires In:</span>
+                   <span class="value"> ${getTimeRemaining(data.expiration_date)}</span>
+                </div>
             </div>
 
             <div class="card age-card">
