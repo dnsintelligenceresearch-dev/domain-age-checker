@@ -20,6 +20,7 @@ class DomainInfo:
         self.registrar = None
         self.status = "unknown"
         self.error = None
+        self.expiration_remaining = None
 
     def to_dict(self):
         """Convert to dictionary for JSON response"""
@@ -30,7 +31,8 @@ class DomainInfo:
             "age": self.age,
             "registrar": self.registrar,
             "status": self.status,
-            "error": self.error
+            "error": self.error,
+            "expiration_remaining": self.expiration_remaining
         }
 
 
@@ -96,6 +98,69 @@ def calculate_age(created_date):
     
     except Exception as e:
         return f"Age cannot be determined ({str(e)})"
+
+
+def calculate_expiration_remaining(expiration_date):
+    """
+    Calculate remaining days and years until domain expiration
+    
+    Args:
+        expiration_date: Expiration date (string or datetime)
+    
+    Returns:
+        Dictionary with days_remaining, years_remaining, and formatted string
+    """
+    if not expiration_date or expiration_date == "Unknown":
+        return {
+            "days_remaining": None,
+            "years_remaining": None,
+            "formatted": "Unknown"
+        }
+    
+    try:
+        if isinstance(expiration_date, str):
+            exp_date = date_parser.parse(expiration_date)
+        else:
+            exp_date = expiration_date
+        
+        today = datetime.now()
+        
+        # Calculate days remaining
+        delta = exp_date - today
+        days_remaining = delta.days
+        
+        if days_remaining < 0:
+            return {
+                "days_remaining": days_remaining,
+                "years_remaining": 0,
+                "formatted": "Expired"
+            }
+        
+        # Calculate years remaining
+        years_remaining = days_remaining // 365
+        remaining_days_in_year = days_remaining % 365
+        
+        # Format string
+        parts = []
+        if years_remaining > 0:
+            parts.append(f"{years_remaining} year{'s' if years_remaining > 1 else ''}")
+        if remaining_days_in_year > 0:
+            parts.append(f"{remaining_days_in_year} day{'s' if remaining_days_in_year > 1 else ''}")
+        
+        formatted = ", ".join(parts) if parts else "Expires today"
+        
+        return {
+            "days_remaining": days_remaining,
+            "years_remaining": years_remaining,
+            "formatted": formatted
+        }
+    
+    except Exception as e:
+        return {
+            "days_remaining": None,
+            "years_remaining": None,
+            "formatted": f"Cannot calculate ({str(e)})"
+        }
 
 
 def normalize_date(date_value):
@@ -182,6 +247,12 @@ def get_domain_age(domain):
         else:
             info.age = "Age cannot be determined"
         
+        # Calculate expiration remaining
+        if info.expiration_date != "Unknown":
+            info.expiration_remaining = calculate_expiration_remaining(info.expiration_date)
+        else:
+            info.expiration_remaining = calculate_expiration_remaining(None)
+        
         return info
     
     except whois.parser.PywhoisError as e:
@@ -193,3 +264,4 @@ def get_domain_age(domain):
         info.error = f"Error during WHOIS lookup: {str(e)}"
         info.status = "error"
         return info
+
