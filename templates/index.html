@@ -128,6 +128,14 @@ function displayResults(data) {
                     <p class="age-text">${escapeHtml(data.age)}</p>
                 </div>
             </div>
+
+            <div class="card expiration-card">
+                <h2>Expiration Countdown</h2>
+                <div class="expiration-display">
+                    <p class="expiration-text">${escapeHtml(data.expiration_remaining.formatted)}</p>
+                    <p class="expiration-days">Days remaining: ${data.expiration_remaining.days_remaining !== null ? data.expiration_remaining.days_remaining : 'N/A'}</p>
+                </div>
+            </div>
         </div>
     `;
     
@@ -164,3 +172,4 @@ document.getElementById('domainInput').addEventListener('keypress', (event) => {
 });
 </script>
 {% endblock %}
+
